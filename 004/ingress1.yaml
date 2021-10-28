@@ -1,0 +1,34 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: ingress-01
+  annotations:
+    virtual-server.f5.com/balance: least-connections-member
+    virtual-server.f5.com/ip: 197.18.160.14
+    virtual-server.f5.com/partition: kubernetes
+    virtual-server.f5.com/health: |
+      [
+        {
+          "path":     "f5.1.com/",
+          "send":     "HTTP GET /",
+          "interval": 5,
+          "timeout":  16
+        }
+      ]
+
+spec:
+  rules:
+    - host: f5.1.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-svc-1
+              servicePort: 80
+    - host: f5.2.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-svc-2
+              servicePort: 80
