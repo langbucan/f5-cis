@@ -1,0 +1,53 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: configmap-test02
+  labels:
+    f5type: virtual-server
+    as3: "true"
+data:
+  template: |
+    {
+      "class": "AS3",
+      "action": "deploy",
+      "persist": true, 
+      "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.25.0",
+        "id": "L4_app",
+        "label": "f5_test_2",
+        "remark": "HTTP application",
+        "f5_test_2": {
+          "class": "Tenant",
+          "f5_test_2": {
+            "class": "Application",
+            "template": "generic",
+            "app_2_svc_vs": {
+              "class": "Service_L4",
+              "persistenceMethods": [ "source-address" ],
+              "virtualAddresses": [
+                "197.18.160.76"
+              ],
+              "virtualPort": 8012,
+              "snat": "auto",
+              "mirroring": "L4",
+              "pool": "app_2_svc_pool"
+            },
+            "app_2_svc_pool": {
+              "class": "Pool",
+              "monitors": [
+                "tcp"
+              ],
+              "loadBalancingMode": "least-connections-member",
+              "members": [
+              {
+                "servicePort": 8877,
+                "serverAddresses": [ ]
+              }
+              ]
+            }
+          }
+        }
+      }
+    }
+
