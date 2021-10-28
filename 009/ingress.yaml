@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress01
+  annotations:
+    virtual-server.f5.com/ip: "197.18.160.14"
+    virtual-server.f5.com/partition: "k8s-ingress"
+    virtual-server.f5.com/balance: "least-connections-member"
+    virtual-server.f5.com/health: |
+      [
+        {
+          "path":     "f5.1.com/",
+          "send":     "HTTP GET /",
+          "interval": 5,
+          "timeout":  16
+        }
+      ]
+spec:
+  rules:
+  - host: f5.1.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: app-svc-2
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress02
+  annotations:
+    virtual-server.f5.com/ip: "197.18.160.76"
+    virtual-server.f5.com/partition: "k8s-ingress"
+    virtual-server.f5.com/balance: "least-connections-member"
+    virtual-server.f5.com/health: |
+      [
+        {
+          "path":     "f5.2.com/",
+          "send":     "HTTP GET /",
+          "interval": 5,
+          "timeout":  16
+        }
+      ]
+spec:
+  rules:
+  - host: f5.2.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: app-svc-3
+          servicePort: 80

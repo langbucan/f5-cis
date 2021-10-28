@@ -1,0 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: config-test05
+  labels:
+    f5type: virtual-server
+data:
+  schema: "f5schemadb://bigip-virtual-server_v0.1.7.json"
+  data: |-
+    {
+      "virtualServer": {
+        "frontend": {
+          "balance": "least-connections-member",
+          "mode": "http",
+          "partition": "k8s-ingress",
+          "virtualAddress": {
+            "bindAddr": "197.18.160.14",
+            "port": 8005
+          }
+        },
+        "backend": {
+          "serviceName": "app-svc-2",
+          "servicePort": 80,
+          "healthMonitors": [{
+            "interval": 30,
+            "timeout": 91,
+            "protocol": "http"
+          }]
+        }
+      }
+    }

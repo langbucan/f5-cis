@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5-bigip-controller-1
+  namespace: f5-bigip
+  labels:
+    app: f5-bigip-controller-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5-bigip-controller-1
+  template:
+    metadata:
+      name: f5-bigip-controller-1
+      labels:
+        app: f5-bigip-controller-1
+    spec:
+      serviceAccountName: f5-bigip-controller
+      nodeSelector:
+        org_name: public_infra
+      imagePullSecrets:
+      - name: jfrog-dev
+      - name: dtr-dev
+      containers:
+        - name: f5-bigip-controller-1
+          image: artifactory.dev.cmbc.cn:31344/fhcloud-docker-sit-local/k8s-bigip-ctlr:2.5.0
+          livenessProbe:
+            failureThreshold: 3
+            exec:
+              command:
+              - curl
+              - -k
+              - -s
+              - -o
+              - /dev/null
+              - https://197.18.160.59
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            successThreshold: 1
+          env:
+            - name: BIGIP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: f5-secret
+                  key: username
+            - name: BIGIP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: f5-secret
+                  key: password
+          command: ["/app/bin/k8s-bigip-ctlr"]
+          args: [
+            "--bigip-username=$(BIGIP_USERNAME)",
+            "--bigip-password=$(BIGIP_PASSWORD)",
+            "--bigip-url=197.18.160.59",
+            "--insecure=true",
+            "--verify-interval=10",
+            "--bigip-partition=k8s-ingress",
+            "--agent=AS3",
+            "--namespace-label=cis_scanner_zone=zone_1",
+            "--flannel-name=/Common/flannel_vxlan",
+            "--pool-member-type=cluster",
+            "--log-as3-response=true"
+            ]

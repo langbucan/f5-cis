@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: f5-ipam-controller
+  name: f5-ipam-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5-ipam-controller
+  template:
+    metadata:
+      labels:
+        app: f5-ipam-controller
+    spec:
+      serviceAccount: f5-bigip-controller
+      containers:
+      - args:
+        - --orchestration=kubernetes
+        - --ip-range='{"Dev":"197.18.160.14-197.18.160.15"}'
+        - --log-level=DEBUG
+        command: ["/app/bin/f5-ipam-controller"]
+        image: artifactory.dev.cmbc.cn:31344/fhcloud-docker-sit-local/f5-ipam-controller:0.1.4
+        name: f5-ipam-controller

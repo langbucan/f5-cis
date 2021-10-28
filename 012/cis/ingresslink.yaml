@@ -1,0 +1,11 @@
+apiVersion: "cis.f5.com/v1"
+kind: IngressLink
+metadata:
+  name: nginx-ingress
+spec:
+  virtualServerAddress: "192.168.200.30"
+  iRules:
+    - /Common/Proxy_Protocol_iRule
+  selector:
+    matchLabels:
+      app: nginx-ingress
